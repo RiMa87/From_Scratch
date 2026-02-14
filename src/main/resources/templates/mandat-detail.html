@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Mandat: ' + ${mandat.fondsName}">Mandat Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>Fondsmandat Prozess-Tracker</h1>
+        <a th:href="@{/}">Zur Übersicht</a>
+    </div>
+</header>
+
+<div class="container">
+
+    <div th:if="${erfolg}" class="erfolg-meldung" th:text="${erfolg}"></div>
+
+    <!-- Mandat Info -->
+    <div class="card">
+        <h2 th:text="${mandat.fondsName}">Fondsname</h2>
+        <div class="mandat-meta">
+            KVG: <span th:text="${mandat.kapitalverwaltungsgesellschaft}">KVG</span>
+            &mdash;
+            Erstellt am: <span th:text="${#temporals.format(mandat.erstelltAm, 'dd.MM.yyyy HH:mm')}">Datum</span>
+        </div>
+
+        <!-- Fortschrittsanzeige -->
+        <div class="progress-container" style="margin-top: 16px;">
+            <strong>Gesamtfortschritt: <span th:text="${mandat.fortschrittProzent} + '%'">0%</span></strong>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill"
+                     th:style="'width:' + ${mandat.fortschrittProzent} + '%'"
+                     th:text="${mandat.fortschrittProzent} + '%'">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meilenstein-Checklisten -->
+    <div th:each="ms : ${meilensteine}" class="card">
+        <div th:with="
+            aufgabenFuerMs=${mandat.aufgaben.?[meilenstein.name() == #vars.ms.name()]},
+            alleErledigt=${#lists.size(aufgabenFuerMs.?[status.name() == 'ERLEDIGT']) == #lists.size(aufgabenFuerMs)},
+            istAktiv=${mandat.aktuellerMeilenstein.name() == #vars.ms.name()}"
+             th:class="'meilenstein-section' + (${alleErledigt} ? ' erledigt' : (${istAktiv} ? ' aktiv' : ''))">
+
+            <div class="meilenstein-header">
+                <h3>
+                    <span th:text="${ms.reihenfolge}">1</span>.
+                    <span th:text="${ms.bezeichnung}">Meilenstein</span>
+                </h3>
+                <span th:if="${alleErledigt}" class="meilenstein-badge badge-erledigt">Erledigt</span>
+                <span th:if="${istAktiv and !alleErledigt}" class="meilenstein-badge badge-aktiv">Aktiv</span>
+                <span th:if="${!istAktiv and !alleErledigt}" class="meilenstein-badge badge-offen">Ausstehend</span>
+            </div>
+
+            <ul class="aufgaben-liste">
+                <li th:each="aufgabe : ${aufgabenFuerMs}" class="aufgabe-item">
+                    <div class="aufgabe-info">
+                        <!-- Status Icon -->
+                        <div th:if="${aufgabe.status.name() == 'ERLEDIGT'}" class="check-icon erledigt">&#10003;</div>
+                        <div th:if="${aufgabe.status.name() == 'IN_BEARBEITUNG'}" class="check-icon in-bearbeitung">&#9679;</div>
+                        <div th:if="${aufgabe.status.name() == 'OFFEN'}" class="check-icon"></div>
+
+                        <!-- Aufgabentext -->
+                        <span th:class="'aufgabe-text' + (${aufgabe.status.name() == 'ERLEDIGT'} ? ' erledigt' : '')"
+                              th:text="${aufgabe.bezeichnung}">Aufgabe</span>
+
+                        <!-- Rolle -->
+                        <span class="rolle-tag" th:text="${aufgabe.zustaendigeRolle.bezeichnung}">Rolle</span>
+                    </div>
+
+                    <!-- Aktionen -->
+                    <div class="aufgabe-actions">
+                        <form th:if="${aufgabe.status.name() == 'OFFEN'}"
+                              th:action="@{/aufgabe/{id}/starten(id=${aufgabe.id})}" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-start">Starten</button>
+                        </form>
+                        <form th:if="${aufgabe.status.name() == 'IN_BEARBEITUNG'}"
+                              th:action="@{/aufgabe/{id}/erledigen(id=${aufgabe.id})}" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-erledigt">Erledigt</button>
+                        </form>
+                        <span th:if="${aufgabe.status.name() == 'ERLEDIGT'}" style="font-size:0.8rem; color:#999;"
+                              th:text="${#temporals.format(aufgabe.erledigtAm, 'dd.MM. HH:mm')}">Datum</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fondsmandat Prozess-Tracker</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>Fondsmandat Prozess-Tracker</h1>
+        <a th:href="@{/mandat/neu}">+ Neues Mandat</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>Mandatierungen</h2>
+
+        <div th:if="${#lists.isEmpty(mandate)}" class="leer-hinweis">
+            Noch keine Mandate vorhanden. Erstellen Sie ein neues Mandat.
+        </div>
+
+        <div th:each="m : ${mandate}" class="mandat-liste-item">
+            <div>
+                <a th:href="@{/mandat/{id}(id=${m.id})}" th:text="${m.fondsName}">Fondsname</a>
+                <div class="mandat-meta">
+                    <span th:text="${m.kapitalverwaltungsgesellschaft}">KVG</span>
+                    &mdash;
+                    <span th:text="${m.aktuellerMeilenstein.bezeichnung}">Meilenstein</span>
+                </div>
+            </div>
+            <div>
+                <div class="progress-bar-bg" style="width: 120px; height: 16px;">
+                    <div class="progress-bar-fill"
+                         th:style="'width:' + ${m.fortschrittProzent} + '%'"
+                         th:text="${m.fortschrittProzent} + '%'">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

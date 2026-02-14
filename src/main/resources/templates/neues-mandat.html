@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neues Mandat anlegen</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>Fondsmandat Prozess-Tracker</h1>
+        <a th:href="@{/}">Zur Übersicht</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>Neues Fondsmandat anlegen</h2>
+        <form th:action="@{/mandat/neu}" method="post">
+            <div class="form-group">
+                <label for="fondsName">Fondsname</label>
+                <input type="text" id="fondsName" name="fondsName" required
+                       placeholder="z.B. Muster Aktienfonds Deutschland"/>
+            </div>
+            <div class="form-group">
+                <label for="kvg">Kapitalverwaltungsgesellschaft (KVG)</label>
+                <input type="text" id="kvg" name="kvg" required
+                       placeholder="z.B. Muster KVG GmbH"/>
+            </div>
+            <button type="submit" class="btn-submit">Mandat erstellen</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
